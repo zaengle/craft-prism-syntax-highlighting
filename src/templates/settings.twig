@@ -20,22 +20,26 @@
 <h2>{{ "General Settings"|t('craft-prism-syntax-highlighting') }}</h2>
 <p>{{"Configure the default syntax highlighting options"|t('craft-prism-syntax-highlighting')}}</p>
 
-{{ forms.selectField({
-    label: 'Theme',
-    instructions: 'Choose an editor theme.',
-    id: 'editorTheme',
-    name: 'editorTheme',
-    value:settings['editorTheme'],
-    options: settings.getEditorThemes()})
+{{ forms.multiselectField({
+    label: 'Themes',
+    instructions: 'Choose default editor themes.',
+    id: 'editorThemes',
+    name: 'editorThemes',
+    values: settings['editorThemes'],
+    options: settings.getEditorThemes(),
+    tip: 'This sets the default selection of themes for new fields.',
+    class: 'selectize fullwidth'})
 }}
 
-{{ forms.selectField({
+{{ forms.multiselectField({
     label: 'Syntax',
-    instructions: 'Choose a default syntax to highlight text with.',
-    id: 'editorLanguage',
-    name: 'editorLanguage',
-    value:settings['editorLanguage'],
-    options: settings.getEditorLanguages()})
+    instructions: 'Choose default editor syntax.',
+    id: 'editorLanguages',
+    name: 'editorLanguages',
+    values: settings['editorLanguages'],
+    options: settings.getEditorLanguages(),
+    tip: 'This sets the default selection of highlighting syntax for new fields.',
+    class: 'selectize fullwidth'})
 }}
 
 {{ forms.textField({
@@ -78,3 +82,12 @@
     required: true,
     placeholder: "/path/to/css/folder"|t('craft-prism-syntax-highlighting')
 }) }}
+
+{% js %}
+    $(function () {
+        $('#settings-editorThemes, #settings-editorLanguages').selectize({
+            plugins: ['remove_button'],
+            dropdownParent: 'body'
+        });
+    });
+{% endjs %}

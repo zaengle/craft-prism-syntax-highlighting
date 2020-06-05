@@ -26,16 +26,6 @@ class Settings extends Model
     // =========================================================================
 
     /**
-     * @var string
-     */
-    public $editorTheme = '';
-
-    /**
-     * @var string
-     */
-    public $editorLanguage = '';
-
-    /**
      * @var array
      */
     public $editorThemes = [];
@@ -103,8 +93,8 @@ class Settings extends Model
     public function rules()
     {
         return [
-            ['editorTheme', 'string'],
-            ['editorLanguage', 'string'],
+            ['editorThemes', 'each', 'rule' => ['string']],
+            ['editorLanguages', 'each', 'rule' => ['string']],
             ['editorHeight', 'string'],
             ['editorHeight', 'default', 'value' => '4'],
             ['editorTabWidth', 'string'],
