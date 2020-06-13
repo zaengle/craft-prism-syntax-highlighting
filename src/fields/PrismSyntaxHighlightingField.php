@@ -49,7 +49,7 @@ class PrismSyntaxHighlightingField extends Field
     // /**
     //  * @var string
     //  */
-    // public $editorLanguageFiles = [];
+    // public $editorLanguageFile = [];
 
     /**
      * @var string
@@ -110,6 +110,10 @@ class PrismSyntaxHighlightingField extends Field
      */
     public function normalizeValue($value, ElementInterface $element = null)
     {
+        if( is_string($value) ){
+            $value = Json::decode($value, true);
+        }
+
         return $value;
     }
 
@@ -178,6 +182,10 @@ class PrismSyntaxHighlightingField extends Field
         $jsonVars = Json::encode($jsonVars);
         Craft::$app->getView()->registerJs("$('#{$namespacedId}-field').PrismSyntaxHighlightingField(" . $jsonVars . ");");
 
+        // Set editor theme and language
+        $editorTheme = (empty($value['editorTheme']) ? $this->defaultEditorTheme : $value['editorTheme']);
+        $editorLanguage = (empty($value['editorLanguage']) ? $this->defaultEditorLanguage : $value['editorLanguage']);
+
         // Render the input template
         return Craft::$app->getView()->renderTemplate(
             'craft-prism-syntax-highlighting/_components/fields/PrismSyntaxHighlightingField_input',
@@ -188,20 +196,56 @@ class PrismSyntaxHighlightingField extends Field
                 'id' => $id,
                 'namespacedId' => $namespacedId,
                 'editorLineNumbers' => $this->editorLineNumbers,
-                'editorLanguageClass' => $this->getDefaultLanguageClass(),
+                'editorLanguageClass' => $this->getLanguageClass($editorLanguage),
+                'editorThemeClass' => $this->getThemeClass($editorTheme),
+                'editorTheme' => $editorTheme,
+                'editorLanguage' => $editorLanguage,
                 'editorHeight' => $this->editorHeight,
-                'editorTabWidth' => $this->editorTabWidth
+                'editorTabWidth' => $this->editorTabWidth,
+                'settings' => $settings
             ]
         );
     }
 
-    public function getDefaultThemeName()
+    /**
+     * Returns the default theme class
+     * @author Josh Smith <josh@batch.nz>
+     * @return string
+     */
+    public function getDefaultThemeClass(): string
     {
-        return $this->defaultEditorTheme;
+        return $this->getThemeClass($this->defaultEditorTheme);
     }
 
-    protected function getDefaultLanguageClass()
+    /**
+     * Returns a theme class
+     * @author Josh Smith <josh@batch.nz>
+     * @param  string $theme
+     * @return string
+     */
+    public function getThemeClass($theme = ''): string
     {
-        return 'language-'.$this->defaultEditorLanguage;
+        return $theme;
+    }
+
+    /**
+     * Returnsthe default language class
+     * @author Josh Smith <josh@batch.nz>
+     * @return string
+     */
+    public function getDefaultLanguageClass(): string
+    {
+        return $this->getLanguageClass($this->defaultEditorLanguage);
+    }
+
+    /**
+     * Returns a language class
+     * @author Josh Smith <josh@batch.nz>
+     * @param  string $language
+     * @return string
+     */
+    public function getLanguageClass($language = ''): string
+    {
+        return 'language-' . $language;
     }
 }

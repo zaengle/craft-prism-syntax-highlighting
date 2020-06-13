@@ -28,9 +28,17 @@
 	text-shadow: none;
 	background: transparent;
   	color: inherit;
-  	box-shadow: inherit;
+  	box-shadow: none;
 }
-
 pre[class*="language-"].prism-syntax-highlighter.line-numbers {
 	padding-left: 3.8em;
+}
+.prism-syntax-highlighter-settings {
+    margin-top: 24px;
+}
+.prism-syntax-highlighter-settings__setting {
+    margin-right: 16px;
+}
+.prism-syntax-highlighter-hr {
+    margin-bottom: 0;
 }
