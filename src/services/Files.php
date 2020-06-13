@@ -65,13 +65,17 @@ class Files extends Component
      * @param  string $filename
      * @return AssetBundle
      */
-    public function registerEditorThemeAssetBundle(string $filename)
+    public function registerEditorThemesAssetBundle(array $files)
     {
         $am = Craft::$app->getAssetManager();
 
         $themeAssetBundle = Craft::$app->getView()->registerAssetBundle(PrismJsThemeAsset::class);
-        $themeAssetBundle->sourcePath = str_replace(basename($filename), '', $filename);
-        $themeAssetBundle->css[] = basename($filename);
+        $themeAssetBundle->sourcePath = self::PRISM_THEMES_DIR;//str_replace(basename($filename), '', $filename);
+
+        foreach ($files as $filepath) {
+            $themeAssetBundle->css[] = basename($filepath);
+        }
+
         $themeAssetBundle->init();
         $themeAssetBundle->publish($am);
 

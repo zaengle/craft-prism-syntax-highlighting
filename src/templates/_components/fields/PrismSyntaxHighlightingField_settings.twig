@@ -15,29 +15,27 @@
 
 {% import "_includes/forms" as forms %}
 
-{% do view.registerAssetBundle("thejoshsmith\\prismsyntaxhighlighting\\assetbundles\\prismsyntaxhighlighting\\PrismSyntaxHighlightingAsset") %}
-
 {{ forms.selectField({
-    label: 'Theme',
-    instructions: 'Choose an editor theme.',
-    id: 'editorTheme',
-    name: 'editorTheme',
-    value: field['editorTheme'] is empty ? defaults['editorTheme'] : field['editorTheme'],
+    label: 'Default Theme',
+    instructions: 'What should the default editor theme be?',
+    id: 'defaultEditorTheme',
+    name: 'defaultEditorTheme',
+    value: field['defaultEditorTheme'],
     options: defaults.getEditorThemes()})
 }}
 
 {{ forms.selectField({
-    label: 'Syntax',
-    instructions: 'Choose a syntax to highlight text with.',
-    id: 'editorLanguage',
-    name: 'editorLanguage',
-    value: field['editorLanguage'] is empty ? defaults['editorLanguage'] : field['editorLanguage'],
+    label: 'Default Syntax',
+    instructions: 'What should the default syntax highlighting language be?',
+    id: 'defaultEditorLanguage',
+    name: 'defaultEditorLanguage',
+    value: field['defaultEditorLanguage'],
     options: defaults.getEditorLanguages()})
 }}
 
 {{ forms.textField({
     label: 'Height',
-    instructions: 'Set the number of rows the editor will be displayed at.',
+    instructions: 'How many rows should the editor will be displayed at?',
     id: 'editorHeight',
     name: 'editorHeight',
     value: field['editorHeight'] is empty ? defaults['editorHeight'] : field['editorHeight']})
@@ -45,7 +43,7 @@
 
 {{ forms.textField({
     label: 'Tab Width',
-    instructions: 'Set the tab width. This uses the experimental CSS property `tab-size`.',
+    instructions: 'What should the tab width be? This uses the experimental CSS property `tab-size`.',
     id: 'editorTabWidth',
     name: 'editorTabWidth',
     value: field['editorTabWidth'] is empty ? defaults['editorTabWidth'] : field['editorTabWidth']})
@@ -53,7 +51,7 @@
 
 {{ forms.lightswitchField({
     label: 'Line Numbers',
-    instructions: 'Choose whether line numbers are displayed or not.',
+    instructions: 'Should line numbers be displayed?',
     id: 'editorLineNumbers',
     name: 'editorLineNumbers',
 	on: field['editorLineNumbers'] is null ? defaults['editorLineNumbers'] : field['editorLineNumbers']})

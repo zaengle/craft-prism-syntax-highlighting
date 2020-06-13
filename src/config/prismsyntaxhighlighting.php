@@ -6,7 +6,7 @@
  */
 
 return [
-  'languages' => ['markup','javascript','css','twig'],
+  'languages' => ['*'],
   'themes' => ['*'],
   'plugins' => ['line-numbers']
 ];

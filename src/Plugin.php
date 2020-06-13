@@ -100,6 +100,57 @@ class Plugin extends CraftPlugin
         );
     }
 
+    /**
+     * Resolves filepaths for the plugin's themes and languages
+     * It's more efficient to do this here, rather than dynamically processing on load.
+     *
+     * @author Josh Smith <me@joshsmith.dev>
+     * @param  bool   $isNew
+     * @return void
+     */
+    public function beforeSaveSettings(): bool
+    {
+        $prismService = self::$plugin->prismService;
+        $prismFilesService = self::$plugin->prismFilesService;
+        $prismSettings = self::$plugin->getSettings();
+
+        $editorThemeFiles = [];
+        $editorLanguageFiles = [];
+
+        // Store the fully qualified theme paths
+        foreach ($prismSettings->editorThemes as $file) {
+            $editorThemeFiles[] = $prismFilesService->getEditorFile(
+                $file.'.css', // Ok to hardcode here, it's the only place it's used.
+                $prismFilesService::PRISM_THEMES_DIR,
+                $prismSettings->customThemesDir
+            );
+        }
+
+        // Store the fully qualified syntax file paths
+        foreach ($prismSettings->editorLanguages as $language) {
+            // Load the language requirements
+            $editorLanguageFileRequirements = $prismService->getLanguageDefinitionRequirements($language);
+            // $editorLanguageFileDefinitions = array_merge($editorLanguageFileRequirements, [$language]);
+
+            // Loop all language requirements and resolve the filepaths
+            foreach ($editorLanguageFileRequirements as $file) {
+                $filename = 'prism-'.$file.'.min.js'; // Ok to hardcode here, it's the only place it's used.
+                $editorLanguageFiles[] = $prismFilesService->getEditorFile(
+                    $filename,
+                    $prismFilesService::PRISM_LANGUAGES_DIR
+                );
+            }
+        }
+
+        // Store the updated settings on the plugin model
+        self::setSettings([
+            'editorThemeFiles' => $editorThemeFiles,
+            'editorLanguageFiles' => $editorLanguageFiles
+        ]);
+
+        return parent::beforeSaveSettings();
+    }
+
     // Protected Methods
     // =========================================================================
 

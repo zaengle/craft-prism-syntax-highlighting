@@ -28,12 +28,22 @@ class Settings extends Model
     /**
      * @var array
      */
-    public $editorThemes = [];
+    public $editorThemes = ['prism'];
 
     /**
      * @var array
      */
-    public $editorLanguages = [];
+    public $editorThemeFiles = [];
+
+    /**
+     * @var array
+     */
+    public $editorLanguages = ['css','javascript','markup'];
+
+    /**
+     * @var array
+     */
+    public $editorLanguageFiles = [];
 
     /**
      * @var string
@@ -59,14 +69,15 @@ class Settings extends Model
     // =========================================================================
 
     /**
-     * Returns an array of editor themes for the twig templates
+     * Returns an array of themes for the twig templates
      * @author Josh Smith <me@joshsmith.dev>
+     * @param array $definitions An array of existing theme definitions
      * @return array
      */
-    public function getEditorThemes()
+    public function getThemes($definitions = [])
     {
         $userThemes = [];
-        $themes = Plugin::$plugin->prismService->getDefinitions('themes');
+        $themes = Plugin::$plugin->prismService->getDefinitions('themes', $definitions);
 
         if( !empty($this->customThemesDir) ){
             $prismConfig = Plugin::$plugin->prismService->getConfig('themes');
@@ -78,13 +89,34 @@ class Settings extends Model
     }
 
     /**
+     * Returns an array of languages for the twig templates
+     * @author Josh Smith <me@joshsmith.dev>
+     * @param array $definitions An array of existing language definitions
+     * @return array
+     */
+    public function getLanguages($definitions = [])
+    {
+        return Plugin::$plugin->prismService->getDefinitions('languages', $definitions);
+    }
+
+    /**
+     * Returns an array of editor themes for the twig templates
+     * @author Josh Smith <me@joshsmith.dev>
+     * @return array
+     */
+    public function getEditorThemes()
+    {
+        return $this->getThemes($this->editorThemes);
+    }
+
+    /**
      * Returns an array of editor languages for the twig templates
      * @author Josh Smith <me@joshsmith.dev>
      * @return array
      */
     public function getEditorLanguages()
     {
-        return Plugin::$plugin->prismService->getDefinitions('languages');
+        return $this->getLanguages($this->editorLanguages);
     }
 
     /**

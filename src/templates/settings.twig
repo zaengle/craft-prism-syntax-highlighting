@@ -22,29 +22,29 @@
 
 {{ forms.multiselectField({
     label: 'Themes',
-    instructions: 'Choose default editor themes.',
+    instructions: 'What themes should be available for new fields?',
     id: 'editorThemes',
     name: 'editorThemes',
     values: settings['editorThemes'],
-    options: settings.getEditorThemes(),
-    tip: 'This sets the default selection of themes for new fields.',
+    options: settings.getThemes(),
+    tip: 'This sets the selection of themes that can be selected on fields.',
     class: 'selectize fullwidth'})
 }}
 
 {{ forms.multiselectField({
     label: 'Syntax',
-    instructions: 'Choose default editor syntax.',
+    instructions: 'What languages should be available to new fields?',
     id: 'editorLanguages',
     name: 'editorLanguages',
     values: settings['editorLanguages'],
-    options: settings.getEditorLanguages(),
-    tip: 'This sets the default selection of highlighting syntax for new fields.',
+    options: settings.getLanguages(),
+    tip: 'This sets the highlighting syntax that can be selected on fields.',
     class: 'selectize fullwidth'})
 }}
 
 {{ forms.textField({
     label: 'Height',
-    instructions: 'Set the default number of rows the editor will be displayed at.',
+    instructions: 'How many rows should the editor will be displayed at?',
     id: 'editorHeight',
     name: 'editorHeight',
     value: settings['editorHeight']})
@@ -52,7 +52,7 @@
 
 {{ forms.textField({
     label: 'Tab Width',
-    instructions: 'Set the tab width. This uses the experimental CSS property `tab-size`.',
+    instructions: 'What should the tab width be? This uses the experimental CSS property `tab-size`.',
     id: 'editorTabWidth',
     name: 'editorTabWidth',
     value: settings['editorTabWidth']})
@@ -60,7 +60,7 @@
 
 {{ forms.lightswitchField({
     label: 'Line Numbers',
-    instructions: 'Choose whether line numbers are displayed or not.',
+    instructions: 'Should line numbers be displayed?',
     id: 'editorLineNumbers',
     name: 'editorLineNumbers',
     on: settings['editorLineNumbers']})
@@ -85,7 +85,7 @@
 
 {% js %}
     $(function () {
-        $('#settings-editorThemes, #settings-editorLanguages').selectize({
+        $('#{{craft.app.view.namespaceInputId('editorThemes')}}, #{{craft.app.view.namespaceInputId('editorLanguages')}}').selectize({
             plugins: ['remove_button'],
             dropdownParent: 'body'
         });

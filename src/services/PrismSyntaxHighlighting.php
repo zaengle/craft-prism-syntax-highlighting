@@ -60,11 +60,11 @@ class PrismSyntaxHighlighting extends Component
      * @param  string $type Type of definition to return
      * @return array        An array of Prism definitions
      */
-    public function getDefinitions(string $type = ''): array
+    public function getDefinitions(string $type = '', array $config = []): array
     {
         if( empty($type) ) return [];
 
-        $config = $this->getConfig($type);
+        $config = empty($config) ? $this->getConfig($type) : $config;
         $definitions = $this->getPrismDefinitions($type);
 
         return $this->parseDefinitions($config, $definitions);

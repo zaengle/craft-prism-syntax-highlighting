@@ -34,22 +34,22 @@ class PrismSyntaxHighlightingField extends Field
     /**
      * @var string
      */
-    public $editorTheme = '';
+    public $defaultEditorTheme = '';
+
+    // /**
+    //  * @var string
+    //  */
+    // public $editorThemeFile = '';
 
     /**
      * @var string
      */
-    public $editorThemeFile = '';
+    public $defaultEditorLanguage = '';
 
-    /**
-     * @var string
-     */
-    public $editorLanguage = '';
-
-    /**
-     * @var string
-     */
-    public $editorLanguageFiles = [];
+    // /**
+    //  * @var string
+    //  */
+    // public $editorLanguageFiles = [];
 
     /**
      * @var string
@@ -87,8 +87,6 @@ class PrismSyntaxHighlightingField extends Field
     {
         $rules = parent::rules();
         $rules = array_merge($rules, [
-            ['editorTheme', 'string'],
-            ['editorLanguage', 'string'],
             ['editorHeight', 'string'],
             ['editorHeight', 'default', 'value' => '4'],
             ['editorTabWidth', 'string'],
@@ -147,43 +145,6 @@ class PrismSyntaxHighlightingField extends Field
     }
 
     /**
-     * Resolves filepaths for this field's themes and languages
-     * It's more efficient to do this here, rather than dynamically processing on load of each field
-     *
-     * @author Josh Smith <me@joshsmith.dev>
-     * @param  bool   $isNew
-     * @return void
-     */
-    public function beforeSave(bool $isNew): bool
-    {
-        $prismService = Plugin::$plugin->prismService;
-        $prismFilesService = Plugin::$plugin->prismFilesService;
-        $prismSettings = Plugin::$plugin->getSettings();
-
-        // Store the fully qualified path
-        $this->editorThemeFile = $prismFilesService->getEditorFile(
-            $this->editorTheme.'.css', // Ok to hardcode here, it's the only place it's used.
-            $prismFilesService::PRISM_THEMES_DIR,
-            $prismSettings->customThemesDir
-        );
-
-        // Load the language requirements
-        $editorLanguageFileRequirements = $prismService->getLanguageDefinitionRequirements($this->editorLanguage);
-        $editorLanguageFileDefinitions = array_merge($editorLanguageFileRequirements, [$this->editorLanguage]);
-
-        // Loop all language requirements and resolve the filepaths
-        foreach ($editorLanguageFileDefinitions as $file) {
-            $filename = 'prism-'.$file.'.min.js'; // Ok to hardcode here, it's the only place it's used.
-            $this->editorLanguageFiles[] = $prismFilesService->getEditorFile(
-                $filename,
-                $prismFilesService::PRISM_LANGUAGES_DIR
-            );
-        }
-
-        return parent::beforeSave($isNew);
-    }
-
-    /**
      * @inheritdoc
      */
     public function getInputHtml($value, ElementInterface $element = null): string
@@ -193,8 +154,8 @@ class PrismSyntaxHighlightingField extends Field
 
         // Load asset bundles
         $prismSyntaxHighlightingAsset = Craft::$app->getView()->registerAssetBundle(PrismSyntaxHighlightingAsset::class);
-        $themeAssetBundle = $prismFilesService->registerEditorThemeAssetBundle($this->editorThemeFile);
-        $languageAssetBundle = $prismFilesService->registerEditorLanguageAssetBundle($this->editorLanguageFiles);
+        $themeAssetBundle = $prismFilesService->registerEditorThemesAssetBundle($settings->editorThemeFiles);
+        $languageAssetBundle = $prismFilesService->registerEditorLanguageAssetBundle($settings->editorLanguageFiles);
 
         // Register the line numbers plugin js and css
         if( $this->editorLineNumbers === '1' ){
@@ -227,20 +188,20 @@ class PrismSyntaxHighlightingField extends Field
                 'id' => $id,
                 'namespacedId' => $namespacedId,
                 'editorLineNumbers' => $this->editorLineNumbers,
-                'editorLanguageClass' => $this->getLanguageClass(),
+                'editorLanguageClass' => $this->getDefaultLanguageClass(),
                 'editorHeight' => $this->editorHeight,
                 'editorTabWidth' => $this->editorTabWidth
             ]
         );
     }
 
-    public function getThemeName()
+    public function getDefaultThemeName()
     {
-        return $this->editorTheme;
+        return $this->defaultEditorTheme;
     }
 
-    protected function getLanguageClass()
+    protected function getDefaultLanguageClass()
     {
-        return 'language-'.$this->editorLanguage;
+        return 'language-'.$this->defaultEditorLanguage;
     }
 }
