@@ -76,6 +76,13 @@
         });
     };
 
+    /**
+     * Replaces a language for the given element(s)
+     * @author Josh Smith <josh@batch.nz>
+     * @param  object|array elements
+     * @param  string replacement
+     * @return void
+     */
     function replaceLanguage(elements, replacement)
     {
       if( !Array.isArray(elements) ){
@@ -87,6 +94,13 @@
       });
     }
 
+    /**
+     * Replaces a theme for the given element(s)
+     * @author Josh Smith <josh@batch.nz>
+     * @param  object|array elements
+     * @param  string replacement
+     * @return void
+     */
     function replaceTheme(elements, replacement)
     {
       if( !Array.isArray(elements) ){
@@ -98,11 +112,18 @@
       });
     }
 
+    /**
+     * Replaces a class with the given replacement
+     * @author Josh Smith <josh@batch.nz>
+     * @param  object $el
+     * @param  string original
+     * @param  string replacement
+     * @return void
+     */
     function replaceClass($el, original, replacement)
     {
       var regExp = new RegExp(original);
       $el.removeClass(function(i, className){
-          console.log('className.match(regExp):', className.match(regExp));
           return (className.match(regExp) || []).join(' ');
       }).addClass(replacement);
     }
