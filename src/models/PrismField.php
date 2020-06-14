@@ -68,25 +68,21 @@ class PrismField extends Model {
      * @param  string $tag
      * @return string
      */
-    public function render($tag = 'code')
+    public function render()
     {
-        if( !in_array($tag, ['code', 'pre']) ){
-            $tag = 'code';
-        }
-
         $prismFilesService = Plugin::$plugin->prismFilesService;
 
         $editorThemeFile = $prismFilesService->getEditorThemeFile($this->editorTheme);
         $editorLanguageFiles = $prismFilesService->getEditorLanguageFile($this->editorLanguage);
 
-        $themeAssetBundle = $prismFilesService->registerEditorThemesAssetBundle([$editorThemeFile]);
-        $languageAssetBundle = $prismFilesService->registerEditorLanguageAssetBundle($editorLanguageFiles);
         $frontEndAssetBundle = $prismFilesService->registerPrismJsAssetBundle();
+        $frontEndAssetBundle = $prismFilesService->registerEditorThemesAssetBundle([$editorThemeFile]);
+        $frontEndAssetBundle = $prismFilesService->registerEditorLanguageAssetBundle($editorLanguageFiles);
 
         Craft::$app->getView()->endBody();
 
         $code = <<<EOD
-        <pre class="{$this->getThemeClass($this->editorTheme)} {$this->getLanguageClass($this->editorLanguage)}"><$tag class="{$this->getLanguageClass($this->editorLanguage)}">$this->code</$tag></pre>
+        <pre class="{$this->getThemeClass($this->editorTheme)} {$this->getLanguageClass($this->editorLanguage)}"><code class="{$this->getLanguageClass($this->editorLanguage)}">$this->code</code></pre>
 EOD;
 
         return new \Twig_Markup($code, 'UTF-8');
