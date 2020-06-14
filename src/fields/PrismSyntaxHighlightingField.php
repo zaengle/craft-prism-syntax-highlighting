@@ -11,14 +11,15 @@
 namespace thejoshsmith\prismsyntaxhighlighting\fields;
 
 use thejoshsmith\prismsyntaxhighlighting\Plugin;
+use thejoshsmith\prismsyntaxhighlighting\models\PrismField;
 use thejoshsmith\prismsyntaxhighlighting\assetbundles\prismsyntaxhighlighting\PrismSyntaxHighlightingAsset;
 
 use Craft;
 use craft\base\ElementInterface;
 use craft\base\Field;
 use craft\helpers\Db;
-use yii\db\Schema;
 use craft\helpers\Json;
+use yii\db\Schema;
 use yii\web\AssetBundle;
 
 /**
@@ -65,6 +66,11 @@ class PrismSyntaxHighlightingField extends Field
      * @var string
      */
     public $editorLineNumbers = false;
+
+    /**
+     * @var string
+     */
+    protected $prismFieldModel;
 
     // Static Methods
     // =========================================================================
@@ -114,7 +120,10 @@ class PrismSyntaxHighlightingField extends Field
             $value = Json::decode($value, true);
         }
 
-        return $value;
+        // Assign a reference to the prism field model
+        $this->prismFieldModel = new PrismField($value);
+
+        return $this->prismFieldModel;
     }
 
     /**
@@ -183,8 +192,8 @@ class PrismSyntaxHighlightingField extends Field
         Craft::$app->getView()->registerJs("$('#{$namespacedId}-field').PrismSyntaxHighlightingField(" . $jsonVars . ");");
 
         // Set editor theme and language
-        $editorTheme = (empty($value['editorTheme']) ? $this->defaultEditorTheme : $value['editorTheme']);
-        $editorLanguage = (empty($value['editorLanguage']) ? $this->defaultEditorLanguage : $value['editorLanguage']);
+        $editorTheme = (empty($this->prismFieldModel->editorTheme) ? $this->defaultEditorTheme : $this->prismFieldModel->editorTheme);
+        $editorLanguage = (empty($this->prismFieldModel->editorLanguage) ? $this->defaultEditorLanguage : $this->prismFieldModel->editorLanguage);
 
         // Render the input template
         return Craft::$app->getView()->renderTemplate(
@@ -195,9 +204,10 @@ class PrismSyntaxHighlightingField extends Field
                 'field' => $this,
                 'id' => $id,
                 'namespacedId' => $namespacedId,
+                'code' => $this->prismFieldModel->code ?? '',
                 'editorLineNumbers' => $this->editorLineNumbers,
-                'editorLanguageClass' => $this->getLanguageClass($editorLanguage),
-                'editorThemeClass' => $this->getThemeClass($editorTheme),
+                'editorLanguageClass' => $this->prismFieldModel->getLanguageClass($editorLanguage),
+                'editorThemeClass' => $this->prismFieldModel->getThemeClass($editorTheme),
                 'editorTheme' => $editorTheme,
                 'editorLanguage' => $editorLanguage,
                 'editorHeight' => $this->editorHeight,
@@ -205,47 +215,5 @@ class PrismSyntaxHighlightingField extends Field
                 'settings' => $settings
             ]
         );
-    }
-
-    /**
-     * Returns the default theme class
-     * @author Josh Smith <josh@batch.nz>
-     * @return string
-     */
-    public function getDefaultThemeClass(): string
-    {
-        return $this->getThemeClass($this->defaultEditorTheme);
-    }
-
-    /**
-     * Returns a theme class
-     * @author Josh Smith <josh@batch.nz>
-     * @param  string $theme
-     * @return string
-     */
-    public function getThemeClass($theme = ''): string
-    {
-        return $theme;
-    }
-
-    /**
-     * Returnsthe default language class
-     * @author Josh Smith <josh@batch.nz>
-     * @return string
-     */
-    public function getDefaultLanguageClass(): string
-    {
-        return $this->getLanguageClass($this->defaultEditorLanguage);
-    }
-
-    /**
-     * Returns a language class
-     * @author Josh Smith <josh@batch.nz>
-     * @param  string $language
-     * @return string
-     */
-    public function getLanguageClass($language = ''): string
-    {
-        return 'language-' . $language;
     }
 }

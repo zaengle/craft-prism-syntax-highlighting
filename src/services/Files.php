@@ -12,6 +12,7 @@ use Craft;
 use craft\base\Component;
 use yii\helpers\FileHelper;
 use yii\web\AssetBundle;
+use thejoshsmith\prismsyntaxhighlighting\assetbundles\prismsyntaxhighlighting\PrismJsAsset;
 use thejoshsmith\prismsyntaxhighlighting\assetbundles\prismsyntaxhighlighting\PrismJsThemeAsset;
 use thejoshsmith\prismsyntaxhighlighting\assetbundles\prismsyntaxhighlighting\PrismJsLanguageAsset;
 use thejoshsmith\prismsyntaxhighlighting\Plugin;
@@ -57,6 +58,69 @@ class Files extends Component
         if( empty($customFiles) ) return '';
 
         return $customFiles[0];
+    }
+
+    public function getEditorThemeFiles(array $files = [], $dir = self::PRISM_THEMES_DIR, $customDir = ''): array
+    {
+        $editorThemeFiles = [];
+
+        // Store the fully qualified theme paths
+        foreach ($files as $file) {
+            $editorThemeFiles[] = $this->getEditorThemeFile($file);
+        }
+
+        return $editorThemeFiles;
+    }
+
+    public function getEditorThemeFile(string $file, $dir = self::PRISM_THEMES_DIR, $customDir = ''): string
+    {
+        return $this->getEditorFile(
+            $file.'.css', // Ok to hardcode here, it's the only place it's used.
+            $dir,
+            $customDir
+        );
+    }
+
+    public function getEditorLanguageFiles(array $files, $dir = self::PRISM_LANGUAGES_DIR): array
+    {
+        $editorLanguageFiles = [];
+
+        // Store the fully qualified theme paths
+        foreach ($files as $file) {
+            $editorLanguageFiles = array_merge($editorLanguageFiles, $this->getEditorLanguageFile($file));
+        }
+
+        return $editorLanguageFiles;
+    }
+
+    public function getEditorLanguageFile(string $file, $dir = self::PRISM_LANGUAGES_DIR): array
+    {
+        $prismService = Plugin::$plugin->prismService;
+
+        $editorLanguageFiles = [];
+        $editorLanguageFileRequirements = $prismService->getLanguageDefinitionRequirements($file);
+
+        // Loop all language requirements and resolve the filepaths
+        foreach ($editorLanguageFileRequirements as $requirement) {
+            $filename = 'prism-'.$requirement.'.min.js'; // Ok to hardcode here, it's the only place it's used.
+            $editorLanguageFiles[] = $this->getEditorFile(
+                $filename,
+                $dir
+            );
+        }
+
+        return $editorLanguageFiles;
+    }
+
+    public function registerPrismJsAssetBundle()
+    {
+        $am = Craft::$app->getAssetManager();
+        $frontEndAssetBundle = Craft::$app->getView()->registerAssetBundle(PrismJsAsset::class);
+
+        $frontEndAssetBundle->init();
+        $frontEndAssetBundle->publish($am);
+
+        return $frontEndAssetBundle;
     }
 
     /**

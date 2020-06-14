@@ -114,33 +114,8 @@ class Plugin extends CraftPlugin
         $prismFilesService = self::$plugin->prismFilesService;
         $prismSettings = self::$plugin->getSettings();
 
-        $editorThemeFiles = [];
-        $editorLanguageFiles = [];
-
-        // Store the fully qualified theme paths
-        foreach ($prismSettings->editorThemes as $file) {
-            $editorThemeFiles[] = $prismFilesService->getEditorFile(
-                $file.'.css', // Ok to hardcode here, it's the only place it's used.
-                $prismFilesService::PRISM_THEMES_DIR,
-                $prismSettings->customThemesDir
-            );
-        }
-
-        // Store the fully qualified syntax file paths
-        foreach ($prismSettings->editorLanguages as $language) {
-            // Load the language requirements
-            $editorLanguageFileRequirements = $prismService->getLanguageDefinitionRequirements($language);
-            // $editorLanguageFileDefinitions = array_merge($editorLanguageFileRequirements, [$language]);
-
-            // Loop all language requirements and resolve the filepaths
-            foreach ($editorLanguageFileRequirements as $file) {
-                $filename = 'prism-'.$file.'.min.js'; // Ok to hardcode here, it's the only place it's used.
-                $editorLanguageFiles[] = $prismFilesService->getEditorFile(
-                    $filename,
-                    $prismFilesService::PRISM_LANGUAGES_DIR
-                );
-            }
-        }
+        $editorThemeFiles = $prismFilesService->getEditorThemeFiles($prismSettings->editorThemes);
+        $editorLanguageFiles = $prismFilesService->getEditorLanguageFiles($prismSettings->editorLanguages);
 
         // Store the updated settings on the plugin model
         self::setSettings([
