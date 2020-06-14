@@ -12,10 +12,11 @@ use Craft;
 use craft\base\Component;
 use yii\helpers\FileHelper;
 use yii\web\AssetBundle;
+use thejoshsmith\prismsyntaxhighlighting\Plugin;
+use thejoshsmith\prismsyntaxhighlighting\services\PrismSyntaxHighlighting;
 use thejoshsmith\prismsyntaxhighlighting\assetbundles\prismsyntaxhighlighting\PrismJsAsset;
 use thejoshsmith\prismsyntaxhighlighting\assetbundles\prismsyntaxhighlighting\PrismJsThemeAsset;
 use thejoshsmith\prismsyntaxhighlighting\assetbundles\prismsyntaxhighlighting\PrismJsLanguageAsset;
-use thejoshsmith\prismsyntaxhighlighting\Plugin;
 
 /**
  * Prism Syntax highlighting Files Service
@@ -124,7 +125,7 @@ class Files extends Component
     }
 
     /**
-     * Retunrs a theme asset bundle
+     * Returns a theme asset bundle
      * @author Josh Smith <me@joshsmith.dev>
      * @param  string $filename
      * @return AssetBundle
@@ -147,7 +148,7 @@ class Files extends Component
     }
 
     /**
-     * Retunrs a languages asset bundle
+     * Returns a languages asset bundle
      * @author Josh Smith <me@joshsmith.dev>
      * @param  array $files
      * @return AssetBundle
@@ -158,6 +159,12 @@ class Files extends Component
 
         $assetBundle = Craft::$app->getView()->registerAssetBundle(PrismJsLanguageAsset::class);
         $assetBundle->sourcePath = self::PRISM_LANGUAGES_DIR;
+
+        // Load Craft required CP languages
+        if( Craft::$app->getRequest()->getIsCpRequest() ) {
+            $craftCpLanguages = $this->getEditorLanguageFiles(PrismSyntaxHighlighting::CRAFTCMS_CP_LANGUAGES);
+            $files = array_unique(array_merge($files, $craftCpLanguages));
+        }
 
         foreach ($files as $filepath) {
             $assetBundle->js[] = basename($filepath);
