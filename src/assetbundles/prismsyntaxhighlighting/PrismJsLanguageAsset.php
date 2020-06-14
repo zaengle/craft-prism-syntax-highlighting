@@ -23,15 +23,5 @@ use thejoshsmith\prismsyntaxhighlighting\Plugin;
  */
 class PrismJsLanguageAsset extends AssetBundle
 {
-    // Public Methods
-    // =========================================================================
 
-    /**
-     * @inheritdoc
-     */
-    public function init()
-    {
-        $this->depends = [CpAsset::class];
-        parent::init();
-    }
 }

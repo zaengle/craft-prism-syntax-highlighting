@@ -33,12 +33,12 @@ class Settings extends Model
     /**
      * @var array
      */
-    public $editorThemeFiles = [];
+    public $editorLanguages = ['css','javascript','markup','json'];
 
     /**
      * @var array
      */
-    public $editorLanguages = ['css','javascript','markup'];
+    public $editorThemeFiles = [];
 
     /**
      * @var array
@@ -100,7 +100,7 @@ class Settings extends Model
     }
 
     /**
-     * Returns an array of editor themes for the twig templates
+     * Returns an array of available editor themes for the twig templates
      * @author Josh Smith <me@joshsmith.dev>
      * @return array
      */
@@ -110,7 +110,7 @@ class Settings extends Model
     }
 
     /**
-     * Returns an array of editor languages for the twig templates
+     * Returns an array of available editor languages for the twig templates
      * @author Josh Smith <me@joshsmith.dev>
      * @return array
      */

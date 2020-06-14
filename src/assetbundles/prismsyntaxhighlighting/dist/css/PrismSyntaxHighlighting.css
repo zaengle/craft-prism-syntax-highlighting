@@ -36,6 +36,9 @@ pre[class*="language-"].prism-syntax-highlighter.line-numbers {
 .prism-syntax-highlighter-settings {
     margin-top: 24px;
 }
+.prism-syntax-highlighter-settings .field {
+    margin: 0;
+}
 .prism-syntax-highlighter-settings__setting {
     margin-right: 16px;
 }
