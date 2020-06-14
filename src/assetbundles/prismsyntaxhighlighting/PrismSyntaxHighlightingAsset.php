@@ -31,28 +31,50 @@ class PrismSyntaxHighlightingAsset extends AssetBundle
     {
         $this->sourcePath = "@thejoshsmith/prismsyntaxhighlighting/assetbundles/prismsyntaxhighlighting/dist";
 
-        $this->depends = [
-            CpAsset::class
-        ];
-
+        // Core Prism Scripts
         $this->js = [
-
-            // Core Prism Scripts
             'js/prism/components/prism-core.min.js',
-
-            // Keypress management
-            'js/bililiteRange/bililiteRange.js',
-            'js/bililiteRange/bililiteRange.fancytext.js',
-            'js/bililiteRange/bililiteRange.undo.js',
-            'js/bililiteRange/bililiteRange.util.js',
-            'js/bililiteRange/jquery.sendkeys.js',
-
-            // Main Script
-            'js/PrismSyntaxHighlighting.js'
         ];
 
-        $this->css = [
-            'css/PrismSyntaxHighlighting.css',
+        // Load these assets on site requests
+        if( Craft::$app->getRequest()->getIsSiteRequest() ) {
+            $this->css = [
+                'css/PrismJs.css'
+            ];
+        }
+
+        // Load these assets on CP requests
+        if( Craft::$app->getRequest()->getIsCpRequest() ){
+            $this->depends = [
+                CpAsset::class
+            ];
+
+            $this->js = array_merge([
+                // Keypress management
+                'js/bililiteRange/bililiteRange.js',
+                'js/bililiteRange/bililiteRange.fancytext.js',
+                'js/bililiteRange/bililiteRange.undo.js',
+                'js/bililiteRange/bililiteRange.util.js',
+                'js/bililiteRange/jquery.sendkeys.js',
+
+                // Main Script
+                'js/PrismSyntaxHighlighting.js'
+            ], $this->js);
+
+            $this->css = [
+                'css/PrismSyntaxHighlighting.css',
+            ];
+        }
+
+        // Only publish required files
+        $this->publishOptions = [
+            'only' => [
+                'js/prism/components/prism-core.min.js',
+                'js/bililiteRange/**',
+                'js/PrismSyntaxHighlighting.js',
+                'css/PrismSyntaxHighlighting.css',
+                'css/PrismJs.css',
+            ]
         ];
 
         parent::init();

@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2019 Josh Smith <me@joshsmith.dev>
  * @link      https://www.joshsmith.dev
  * @package   PrismSyntaxHighlighting
- * @since     1.0.2
+ * @since     1.0.0
  */
 .prism-syntax-highlighter {
 	outline: none;
@@ -44,4 +44,8 @@ pre[class*="language-"].prism-syntax-highlighter.line-numbers {
 }
 .prism-syntax-highlighter-hr {
     margin-bottom: 0;
+}
+/* Remove horizontal rules from the last field in a fields block */
+div[data-type="thejoshsmith\\prismsyntaxhighlighting\\fields\\PrismSyntaxHighlightingField"]:last-child hr {
+    display: none;
 }

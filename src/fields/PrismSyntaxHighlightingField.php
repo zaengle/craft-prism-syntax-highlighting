@@ -37,20 +37,10 @@ class PrismSyntaxHighlightingField extends Field
      */
     public $defaultEditorTheme = '';
 
-    // /**
-    //  * @var string
-    //  */
-    // public $editorThemeFile = '';
-
     /**
      * @var string
      */
     public $defaultEditorLanguage = '';
-
-    // /**
-    //  * @var string
-    //  */
-    // public $editorLanguageFile = [];
 
     /**
      * @var string

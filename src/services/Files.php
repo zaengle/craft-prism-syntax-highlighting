@@ -113,17 +113,6 @@ class Files extends Component
         return $editorLanguageFiles;
     }
 
-    public function registerPrismJsAssetBundle()
-    {
-        $am = Craft::$app->getAssetManager();
-        $frontEndAssetBundle = Craft::$app->getView()->registerAssetBundle(PrismJsAsset::class);
-
-        $frontEndAssetBundle->init();
-        $frontEndAssetBundle->publish($am);
-
-        return $frontEndAssetBundle;
-    }
-
     /**
      * Returns a theme asset bundle
      * @author Josh Smith <me@joshsmith.dev>
@@ -140,6 +129,10 @@ class Files extends Component
         foreach ($files as $filepath) {
             $themeAssetBundle->css[] = basename($filepath);
         }
+
+        $themeAssetBundle->publishOptions = [
+            'only' => $themeAssetBundle->css
+        ];
 
         $themeAssetBundle->init();
         $themeAssetBundle->publish($am);
@@ -169,6 +162,10 @@ class Files extends Component
         foreach ($files as $filepath) {
             $assetBundle->js[] = basename($filepath);
         }
+
+        $assetBundle->publishOptions = [
+            'only' => $assetBundle->js
+        ];
 
         $assetBundle->init();
         $assetBundle->publish($am);

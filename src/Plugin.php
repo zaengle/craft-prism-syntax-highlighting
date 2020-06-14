@@ -10,8 +10,7 @@
 
 namespace thejoshsmith\prismsyntaxhighlighting;
 
-use thejoshsmith\prismsyntaxhighlighting\variables\PrismSyntaxHighlightingVariable;
-use thejoshsmith\prismsyntaxhighlighting\twigextensions\PrismSyntaxHighlightingTwigExtension;
+use thejoshsmith\prismsyntaxhighlighting\models\PrismField;
 use thejoshsmith\prismsyntaxhighlighting\models\Settings;
 use thejoshsmith\prismsyntaxhighlighting\services\Files;
 use thejoshsmith\prismsyntaxhighlighting\services\PrismSyntaxHighlighting;
@@ -19,10 +18,7 @@ use thejoshsmith\prismsyntaxhighlighting\fields\PrismSyntaxHighlightingField;
 
 use Craft;
 use craft\base\Plugin as CraftPlugin;
-use craft\services\Plugins;
-use craft\events\PluginEvent;
 use craft\services\Fields;
-use craft\web\twig\variables\CraftVariable;
 use craft\events\RegisterComponentTypesEvent;
 use craft\web\View;
 use craft\events\TemplateEvent;
@@ -66,8 +62,6 @@ class Plugin extends CraftPlugin
         parent::init();
         self::$plugin = $this;
 
-        Craft::$app->view->registerTwigExtension(new PrismSyntaxHighlightingTwigExtension());
-
         Event::on(
             Fields::class,
             Fields::EVENT_REGISTER_FIELD_TYPES,
@@ -76,6 +70,9 @@ class Plugin extends CraftPlugin
             }
         );
 
+        /**
+         * Prevent the Craft CMS CP version of PrismJS from loading
+         */
         Event::on(
             View::class,
             View::EVENT_BEFORE_RENDER_TEMPLATE,
@@ -93,13 +90,17 @@ class Plugin extends CraftPlugin
             }
         );
 
+        /**
+         * Register field PrismJS assets
+         * This is used to process queued asset files when rendering fields on the front end
+         */
         Event::on(
-            CraftVariable::class,
-            CraftVariable::EVENT_INIT,
-            function (Event $event) {
-                /** @var CraftVariable $variable */
-                $variable = $event->sender;
-                $variable->set('prismSyntaxHighlighting', PrismSyntaxHighlightingVariable::class);
+            View::class,
+            View::EVENT_END_BODY,
+            function(Event $event) {
+                if( Craft::$app->getRequest()->getIsSiteRequest() ){
+                    PrismField::registerAssetFiles();
+                }
             }
         );
 
