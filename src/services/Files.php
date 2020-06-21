@@ -14,8 +14,6 @@ use yii\helpers\FileHelper;
 use yii\web\AssetBundle;
 use thejoshsmith\prismsyntaxhighlighting\Plugin;
 use thejoshsmith\prismsyntaxhighlighting\services\PrismSyntaxHighlighting;
-use thejoshsmith\prismsyntaxhighlighting\assetbundles\prismsyntaxhighlighting\PrismJsThemeAsset;
-use thejoshsmith\prismsyntaxhighlighting\assetbundles\prismsyntaxhighlighting\PrismJsLanguageAsset;
 use thejoshsmith\prismsyntaxhighlighting\assetbundles\prismsyntaxhighlighting\PrismSyntaxHighlightingAsset;
 
 /**
