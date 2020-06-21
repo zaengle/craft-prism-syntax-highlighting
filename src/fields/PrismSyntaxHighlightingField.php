@@ -110,10 +110,7 @@ class PrismSyntaxHighlightingField extends Field
             $value = Json::decode($value, true);
         }
 
-        // Assign a reference to the prism field model
-        $this->prismFieldModel = new PrismField($value);
-
-        return $this->prismFieldModel;
+        return $value;
     }
 
     /**
@@ -154,11 +151,12 @@ class PrismSyntaxHighlightingField extends Field
     {
         $settings = Plugin::$plugin->getSettings();
         $prismFilesService = Plugin::$plugin->prismFilesService;
+        $prismEditorService = Plugin::$plugin->prismEditorService;
 
         // Load asset bundles
         $prismSyntaxHighlightingAsset = Craft::$app->getView()->registerAssetBundle(PrismSyntaxHighlightingAsset::class);
-        $themeAssetBundle = $prismFilesService->registerEditorThemesAssetBundle($settings->editorThemeFiles);
-        $languageAssetBundle = $prismFilesService->registerEditorLanguageAssetBundle($settings->editorLanguageFiles);
+        $themeAssetBundle = $prismFilesService->registerEditorThemesAssetBundle($settings->editorThemes);
+        $languageAssetBundle = $prismFilesService->registerEditorLanguageAssetBundle($settings->editorLanguages);
 
         // Register the line numbers plugin js and css
         if( $this->editorLineNumbers === '1' ){
@@ -182,8 +180,8 @@ class PrismSyntaxHighlightingField extends Field
         Craft::$app->getView()->registerJs("$('#{$namespacedId}-field').PrismSyntaxHighlightingField(" . $jsonVars . ");");
 
         // Set editor theme and language
-        $editorTheme = (empty($this->prismFieldModel->editorTheme) ? $this->defaultEditorTheme : $this->prismFieldModel->editorTheme);
-        $editorLanguage = (empty($this->prismFieldModel->editorLanguage) ? $this->defaultEditorLanguage : $this->prismFieldModel->editorLanguage);
+        $editorTheme = (empty($value['editorTheme']) ? $this->defaultEditorTheme : $value['editorTheme']);
+        $editorLanguage = (empty($value['editorLanguage']) ? $this->defaultEditorLanguage : $value['editorLanguage']);
 
         // Render the input template
         return Craft::$app->getView()->renderTemplate(
@@ -194,10 +192,10 @@ class PrismSyntaxHighlightingField extends Field
                 'field' => $this,
                 'id' => $id,
                 'namespacedId' => $namespacedId,
-                'code' => $this->prismFieldModel->code ?? '',
+                'code' => $value['code'] ?? '',
                 'editorLineNumbers' => $this->editorLineNumbers,
-                'editorLanguageClass' => $this->prismFieldModel->getLanguageClass($editorLanguage),
-                'editorThemeClass' => $this->prismFieldModel->getThemeClass($editorTheme),
+                'editorLanguageClass' => $prismEditorService->getLanguageClass($editorLanguage),
+                'editorThemeClass' => $prismEditorService->getThemeClass($editorTheme),
                 'editorTheme' => $editorTheme,
                 'editorLanguage' => $editorLanguage,
                 'editorHeight' => $this->editorHeight,

@@ -14,7 +14,6 @@ use yii\helpers\FileHelper;
 use yii\web\AssetBundle;
 use thejoshsmith\prismsyntaxhighlighting\Plugin;
 use thejoshsmith\prismsyntaxhighlighting\services\PrismSyntaxHighlighting;
-use thejoshsmith\prismsyntaxhighlighting\assetbundles\prismsyntaxhighlighting\PrismJsAsset;
 use thejoshsmith\prismsyntaxhighlighting\assetbundles\prismsyntaxhighlighting\PrismJsThemeAsset;
 use thejoshsmith\prismsyntaxhighlighting\assetbundles\prismsyntaxhighlighting\PrismJsLanguageAsset;
 
@@ -30,8 +29,9 @@ class Files extends Component
      * Constant filepaths
      * @var string
      */
-    const PRISM_THEMES_DIR = '@thejoshsmith/prismsyntaxhighlighting/assetbundles/prismsyntaxhighlighting/dist/css/prism/themes';
-    const PRISM_LANGUAGES_DIR = '@thejoshsmith/prismsyntaxhighlighting/assetbundles/prismsyntaxhighlighting/dist/js/prism/components';
+    const PRISM_DIST_DIR = '@thejoshsmith/prismsyntaxhighlighting/assetbundles/prismsyntaxhighlighting/dist';
+    const PRISM_THEMES_DIR = self::PRISM_DIST_DIR . '/css/prism/themes';
+    const PRISM_LANGUAGES_DIR = self::PRISM_DIST_DIR . '/js/prism/components';
 
     /**
      * Returns a fully qualified filepath for the passed filename
@@ -119,20 +119,19 @@ class Files extends Component
      * @param  string $filename
      * @return AssetBundle
      */
-    public function registerEditorThemesAssetBundle(array $files)
+    public function registerEditorThemesAssetBundle(array $themes)
     {
         $am = Craft::$app->getAssetManager();
 
         $themeAssetBundle = Craft::$app->getView()->registerAssetBundle(PrismJsThemeAsset::class);
         $themeAssetBundle->sourcePath = self::PRISM_THEMES_DIR;//str_replace(basename($filename), '', $filename);
 
+        // Fetch the theme files
+        $files = $this->getEditorThemeFiles($themes);
+
         foreach ($files as $filepath) {
             $themeAssetBundle->css[] = basename($filepath);
         }
-
-        $themeAssetBundle->publishOptions = [
-            'only' => $themeAssetBundle->css
-        ];
 
         $themeAssetBundle->init();
         $themeAssetBundle->publish($am);
@@ -146,12 +145,15 @@ class Files extends Component
      * @param  array $files
      * @return AssetBundle
      */
-    public function registerEditorLanguageAssetBundle(array $files)
+    public function registerEditorLanguageAssetBundle(array $languages)
     {
         $am = Craft::$app->getAssetManager();
 
         $assetBundle = Craft::$app->getView()->registerAssetBundle(PrismJsLanguageAsset::class);
         $assetBundle->sourcePath = self::PRISM_LANGUAGES_DIR;
+
+        // Fetch the language files
+        $files = $this->getEditorLanguageFiles($languages);
 
         // Load Craft required CP languages
         if( Craft::$app->getRequest()->getIsCpRequest() ) {
@@ -162,10 +164,6 @@ class Files extends Component
         foreach ($files as $filepath) {
             $assetBundle->js[] = basename($filepath);
         }
-
-        $assetBundle->publishOptions = [
-            'only' => $assetBundle->js
-        ];
 
         $assetBundle->init();
         $assetBundle->publish($am);

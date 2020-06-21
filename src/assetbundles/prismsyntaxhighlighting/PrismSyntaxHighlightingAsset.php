@@ -69,11 +69,11 @@ class PrismSyntaxHighlightingAsset extends AssetBundle
         // Only publish required files
         $this->publishOptions = [
             'only' => [
-                'js/prism/components/prism-core.min.js',
-                'js/bililiteRange/**',
                 'js/PrismSyntaxHighlighting.js',
-                'css/PrismSyntaxHighlighting.css',
+                'js/bililiteRange/**',
+                'js/prism/components/prism-core.min.js',
                 'css/PrismJs.css',
+                'css/PrismSyntaxHighlighting.css',
             ]
         ];
 

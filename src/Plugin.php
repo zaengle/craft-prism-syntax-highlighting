@@ -12,9 +12,11 @@ namespace thejoshsmith\prismsyntaxhighlighting;
 
 use thejoshsmith\prismsyntaxhighlighting\models\PrismField;
 use thejoshsmith\prismsyntaxhighlighting\models\Settings;
+use thejoshsmith\prismsyntaxhighlighting\services\Editor;
 use thejoshsmith\prismsyntaxhighlighting\services\Files;
 use thejoshsmith\prismsyntaxhighlighting\services\PrismSyntaxHighlighting;
 use thejoshsmith\prismsyntaxhighlighting\fields\PrismSyntaxHighlightingField;
+use thejoshsmith\prismsyntaxhighlighting\twigextensions\PrismSyntaxHighlightingTwigExtension;
 
 use Craft;
 use craft\base\Plugin as CraftPlugin;
@@ -71,6 +73,13 @@ class Plugin extends CraftPlugin
         );
 
         /**
+         * Register twig extensions
+         */
+        if( Craft::$app->getRequest()->getIsSiteRequest() ){
+            Craft::$app->view->registerTwigExtension(new PrismSyntaxHighlightingTwigExtension());
+        }
+
+        /**
          * Prevent the Craft CMS CP version of PrismJS from loading
          */
         Event::on(
@@ -96,16 +105,17 @@ class Plugin extends CraftPlugin
          */
         Event::on(
             View::class,
-            View::EVENT_END_BODY,
+            View::EVENT_END_PAGE,
             function(Event $event) {
                 if( Craft::$app->getRequest()->getIsSiteRequest() ){
-                    PrismField::registerAssetFiles();
+                    Editor::registerAssetFiles();
                 }
             }
         );
 
         // Register the prism files service
         Craft::$app->setComponents([
+            'prismEditorService' => Editor::class,
             'prismFilesService' => Files::class,
             'prismService' => PrismSyntaxHighlighting::class,
         ]);
@@ -118,32 +128,6 @@ class Plugin extends CraftPlugin
             ),
             __METHOD__
         );
-    }
-
-    /**
-     * Resolves filepaths for the plugin's themes and languages
-     * It's more efficient to do this here, rather than dynamically processing on load.
-     *
-     * @author Josh Smith <me@joshsmith.dev>
-     * @param  bool   $isNew
-     * @return void
-     */
-    public function beforeSaveSettings(): bool
-    {
-        $prismService = self::$plugin->prismService;
-        $prismFilesService = self::$plugin->prismFilesService;
-        $prismSettings = self::$plugin->getSettings();
-
-        $editorThemeFiles = $prismFilesService->getEditorThemeFiles($prismSettings->editorThemes);
-        $editorLanguageFiles = $prismFilesService->getEditorLanguageFiles($prismSettings->editorLanguages);
-
-        // Store the updated settings on the plugin model
-        self::setSettings([
-            'editorThemeFiles' => $editorThemeFiles,
-            'editorLanguageFiles' => $editorLanguageFiles
-        ]);
-
-        return parent::beforeSaveSettings();
     }
 
     // Protected Methods

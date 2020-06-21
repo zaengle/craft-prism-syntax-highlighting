@@ -36,16 +36,6 @@ class Settings extends Model
     public $editorLanguages = ['css','javascript','markup','json'];
 
     /**
-     * @var array
-     */
-    public $editorThemeFiles = [];
-
-    /**
-     * @var array
-     */
-    public $editorLanguageFiles = [];
-
-    /**
      * @var string
      */
     public $editorHeight = '4';
