@@ -108,7 +108,7 @@ class Plugin extends CraftPlugin
             View::EVENT_END_PAGE,
             function(Event $event) {
                 if( Craft::$app->getRequest()->getIsSiteRequest() ){
-                    Editor::registerAssetFiles();
+                    self::$plugin->prismEditorService->registerTemplateAssetFiles();
                 }
             }
         );

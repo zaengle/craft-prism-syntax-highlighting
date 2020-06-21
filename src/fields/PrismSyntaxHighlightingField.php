@@ -150,19 +150,10 @@ class PrismSyntaxHighlightingField extends Field
     public function getInputHtml($value, ElementInterface $element = null): string
     {
         $settings = Plugin::$plugin->getSettings();
-        $prismFilesService = Plugin::$plugin->prismFilesService;
         $prismEditorService = Plugin::$plugin->prismEditorService;
 
-        // Load asset bundles
-        $prismSyntaxHighlightingAsset = Craft::$app->getView()->registerAssetBundle(PrismSyntaxHighlightingAsset::class);
-        $themeAssetBundle = $prismFilesService->registerEditorThemesAssetBundle($settings->editorThemes);
-        $languageAssetBundle = $prismFilesService->registerEditorLanguageAssetBundle($settings->editorLanguages);
-
-        // Register the line numbers plugin js and css
-        if( $this->editorLineNumbers === '1' ){
-            $prismSyntaxHighlightingAsset->js[] = 'js/prism/plugins/line-numbers/prism-line-numbers.min.js';
-            $prismSyntaxHighlightingAsset->css[] = 'js/prism/plugins/line-numbers/prism-line-numbers.css';
-        }
+        // Register asset files
+        $prismEditorService->registerAssetFiles();
 
         // Get our id and namespace
         $id = Craft::$app->getView()->formatInputId($this->handle);

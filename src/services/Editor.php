@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Prism Syntax Highlighting - Files Service
+ * Prism Syntax Highlighting - Editor Service
  *
  * @link      https://www.joshsmith.dev
  * @copyright Copyright (c) 2019 Josh Smith
@@ -15,6 +15,7 @@ use thejoshsmith\prismsyntaxhighlighting\assetbundles\prismsyntaxhighlighting\Pr
 use Craft;
 use craft\base\Component;
 use craft\web\View;
+use yii\web\AssetBundle;
 
 /**
  * Prism Syntax highlighting Editor Service
@@ -64,7 +65,7 @@ class Editor extends Component
      * @author Josh Smith <josh@batch.nz>
      * @return boolean
      */
-    public static function hasAssetFiles(): bool
+    public function hasTemplateAssetFiles(): bool
     {
         return !empty(self::$editorThemes) || !empty(self::$editorLanguages);
     }
@@ -75,23 +76,50 @@ class Editor extends Component
      * @author Josh Smith <josh@batch.nz>
      * @return void
      */
-    public static function registerAssetFiles()
+    public function registerTemplateAssetFiles(): ?AssetBundle
     {
-        if( !self::hasAssetFiles() ) return;
+        if( !$this->hasTemplateAssetFiles() ) return null;
+        return $this->registerAssetFiles(self::$editorLanguages, self::$editorThemes);
+    }
 
-        $assetBundles = [];
+    /**
+     * Registers asset files required by a prism editor
+     * Defaults the languages and themes to the plugin settings
+     * Takes an array of language and theme definitions and loads/publishes the required asset files into the view
+     *
+     * @author Josh Smith <josh@batch.nz>
+     * @param  array  $editorLanguages An array of prism language definitions
+     * @param  array  $editorThemes    An array of prism theme definitions
+     * @return AssetBundle
+     */
+    public function registerAssetFiles(array $editorLanguages = [], array $editorThemes = []): AssetBundle
+    {
+        $settings = Plugin::$plugin->getSettings();
+
+        if( empty($editorLanguages) ){
+            $editorLanguages = $settings->editorLanguages;
+        }
+
+        if( empty($editorThemes) ){
+            $editorThemes = $settings->editorThemes;
+        }
+
         $view = Craft::$app->getView();
         $prismFilesService = Plugin::$plugin->prismFilesService;
 
-        // Register asset bundles
-        $assetBundles[] = PrismSyntaxHighlightingAsset::register($view);
-        $assetBundles[] = $prismFilesService->registerEditorThemesAssetBundle(self::$editorThemes);
-        $assetBundles[] = $prismFilesService->registerEditorLanguageAssetBundle(self::$editorLanguages);
+        // Fetch the theme and language files we need to load from the definitions
+        $editorThemeFiles = $prismFilesService->getEditorThemeAssetBundleFiles($editorThemes);
+        $editorLanguageFiles = $prismFilesService->getEditorLanguageAssetBundleFiles($editorLanguages);
 
-        // Publish files to the view
-        foreach ($assetBundles as $bundle) {
-            $bundle->registerAssetFiles($view);
-        }
+        // Register the prism asset bundle
+        $assetBundle = PrismSyntaxHighlightingAsset::register($view);
+        $assetBundle->js = array_merge($assetBundle->js, $editorLanguageFiles);
+        $assetBundle->css = array_merge($assetBundle->css, $editorThemeFiles);
+
+        // Register asset bundle files with the view
+        $assetBundle->registerAssetFiles($view);
+
+        return $assetBundle;
     }
 
      /**

@@ -14,6 +14,12 @@ use thejoshsmith\prismsyntaxhighlighting\Plugin;
  */
 class PrismSyntaxHighlighting extends Component
 {
+    /**
+     * Define a cache key to hold the definitions
+     * @var string
+     */
+    const DEFINITIONS_CACHE_KEY = 'prismSyntaxHighlighting:definitions';
+
 	/**
 	 * Define the config file that holds the language definitions
 	 * @var string
@@ -39,7 +45,7 @@ class PrismSyntaxHighlighting extends Component
 	public static $componentsDefinitionFile = '@thejoshsmith/prismsyntaxhighlighting/assetbundles/prismsyntaxhighlighting/dist/js/prism/components.json';
 
     /**
-     * Static cache to hold the loaded definitions
+     * Cache to hold the loaded definitions
      * @var object
      */
     protected $prismDefinitions;
@@ -106,13 +112,9 @@ class PrismSyntaxHighlighting extends Component
      */
     public function getPrismDefinitions(string $key = '')
     {
-        if( empty($this->prismDefinitions) ){
-            try {
-                $this->prismDefinitions = $this->loadPrismDefinitions();
-            } catch (\Exception $e) {
-                return [];
-            }
-        }
+        $this->prismDefinitions = Craft::$app->getCache()->getOrSet(self::DEFINITIONS_CACHE_KEY, function() {
+            return $this->loadPrismDefinitions();
+        });
 
         if( empty($key) ) return $this->prismDefinitions;
         if( property_exists($this->prismDefinitions, $key) ) return $this->prismDefinitions->{$key};

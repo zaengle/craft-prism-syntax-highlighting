@@ -10,6 +10,8 @@
 
 namespace thejoshsmith\prismsyntaxhighlighting\assetbundles\prismsyntaxhighlighting;
 
+use thejoshsmith\prismsyntaxhighlighting\services\Files;
+
 use Craft;
 use craft\web\AssetBundle;
 use craft\web\assets\cp\CpAsset;
@@ -29,7 +31,7 @@ class PrismSyntaxHighlightingAsset extends AssetBundle
      */
     public function init()
     {
-        $this->sourcePath = "@thejoshsmith/prismsyntaxhighlighting/assetbundles/prismsyntaxhighlighting/dist";
+        $this->sourcePath = Files::PRISM_DIST_DIR;
 
         // Core Prism Scripts
         $this->js = [
@@ -45,9 +47,9 @@ class PrismSyntaxHighlightingAsset extends AssetBundle
 
         // Load these assets on CP requests
         if( Craft::$app->getRequest()->getIsCpRequest() ){
-            $this->depends = [
-                CpAsset::class
-            ];
+            $this->depends = [CpAsset::class];
+            $this->jsOptions = ['depends' => CpAsset::class];
+            $this->cssOptions = ['depends' => CpAsset::class];
 
             $this->js = array_merge([
                 // Keypress management
@@ -65,17 +67,6 @@ class PrismSyntaxHighlightingAsset extends AssetBundle
                 'css/PrismSyntaxHighlighting.css',
             ];
         }
-
-        // Only publish required files
-        $this->publishOptions = [
-            'only' => [
-                'js/PrismSyntaxHighlighting.js',
-                'js/bililiteRange/**',
-                'js/prism/components/prism-core.min.js',
-                'css/PrismJs.css',
-                'css/PrismSyntaxHighlighting.css',
-            ]
-        ];
 
         parent::init();
     }
