@@ -53,14 +53,9 @@ class PrismSyntaxHighlightingField extends Field
     public $editorTabWidth = '4';
 
     /**
-     * @var string
+     * @var array
      */
-    public $editorLineNumbers = false;
-
-    /**
-     * @var string
-     */
-    protected $prismFieldModel;
+    public $editorPlugins = [];
 
     // Static Methods
     // =========================================================================
@@ -86,9 +81,7 @@ class PrismSyntaxHighlightingField extends Field
             ['editorHeight', 'string'],
             ['editorHeight', 'default', 'value' => '4'],
             ['editorTabWidth', 'string'],
-            ['editorTabWidth', 'default', 'value' => '4'],
-            ['editorLineNumbers', 'boolean'],
-            ['editorLineNumbers', 'default', 'value' => false],
+            ['editorTabWidth', 'default', 'value' => '4']
         ]);
         return $rules;
     }
@@ -127,12 +120,6 @@ class PrismSyntaxHighlightingField extends Field
     public function getSettingsHtml()
     {
         $settings = Plugin::$plugin->getSettings();
-
-        // Allow the lightswitch to use defaults if it's a new field.
-        // It's set to a boolean by default, so we need to nullify it.
-        if( $this->id === null ){
-            $this->editorLineNumbers = null;
-        }
 
         // Render the settings template
         return Craft::$app->getView()->renderTemplate(
@@ -174,6 +161,11 @@ class PrismSyntaxHighlightingField extends Field
         $editorTheme = (empty($value['editorTheme']) ? $this->defaultEditorTheme : $value['editorTheme']);
         $editorLanguage = (empty($value['editorLanguage']) ? $this->defaultEditorLanguage : $value['editorLanguage']);
 
+        // Register plugin hooks
+        // $hookId = uniqid();
+        // $prismEditorService->registerPluginClassHooks($hookId);
+        // $prismEditorService->registerPluginInputHtmlHooks($this);
+
         // Render the input template
         return Craft::$app->getView()->renderTemplate(
             'craft-prism-syntax-highlighting/_components/fields/PrismSyntaxHighlightingField_input',
@@ -182,13 +174,14 @@ class PrismSyntaxHighlightingField extends Field
                 'value' => $value,
                 'field' => $this,
                 'id' => $id,
+                // 'hookId' => $hookId,
                 'namespacedId' => $namespacedId,
                 'code' => $value['code'] ?? '',
-                'editorLineNumbers' => $this->editorLineNumbers,
                 'editorLanguageClass' => $prismEditorService->getLanguageClass($editorLanguage),
                 'editorThemeClass' => $prismEditorService->getThemeClass($editorTheme),
                 'editorTheme' => $editorTheme,
                 'editorLanguage' => $editorLanguage,
+                'editorPlugins' => $value['editorPlugins'] ?? $this->editorPlugins,
                 'editorHeight' => $this->editorHeight,
                 'editorTabWidth' => $this->editorTabWidth,
                 'settings' => $settings

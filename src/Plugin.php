@@ -17,13 +17,15 @@ use thejoshsmith\prismsyntaxhighlighting\services\Files;
 use thejoshsmith\prismsyntaxhighlighting\services\PrismSyntaxHighlighting;
 use thejoshsmith\prismsyntaxhighlighting\fields\PrismSyntaxHighlightingField;
 use thejoshsmith\prismsyntaxhighlighting\twigextensions\PrismSyntaxHighlightingTwigExtension;
+use thejoshsmith\prismsyntaxhighlighting\variables\CraftPrismSyntaxHighlightingBehavior;
 
 use Craft;
 use craft\base\Plugin as CraftPlugin;
-use craft\services\Fields;
 use craft\events\RegisterComponentTypesEvent;
-use craft\web\View;
 use craft\events\TemplateEvent;
+use craft\services\Fields;
+use craft\web\View;
+use craft\web\twig\variables\CraftVariable;
 
 use yii\base\Event;
 
@@ -80,6 +82,15 @@ class Plugin extends CraftPlugin
         }
 
         /**
+         * Register twig variables
+         */
+        Event::on(CraftVariable::class, CraftVariable::EVENT_INIT, function(Event $event) {
+            /** @var CraftVariable $variable */
+            $variable = $event->sender;
+            $variable->attachBehavior('syntaxHighlighting', CraftPrismSyntaxHighlightingBehavior::class);
+        });
+
+        /**
          * Prevent the Craft CMS CP version of PrismJS from loading
          */
         Event::on(
@@ -120,6 +131,8 @@ class Plugin extends CraftPlugin
             'prismService' => PrismSyntaxHighlighting::class,
         ]);
 
+        // $this->registerEditorPlugins();
+
         Craft::info(
             Craft::t(
                 'craft-prism-syntax-highlighting',
@@ -140,6 +153,17 @@ class Plugin extends CraftPlugin
     {
         return new Settings();
     }
+
+    // /**
+    //  * Registers prism plugins
+    //  * @author Josh Smith <josh@batch.nz>
+    //  * @return void
+    //  */
+    // protected function registerEditorPlugins()
+    // {
+    //     $settings = $this->getSettings();
+    //     self::$plugin->prismEditorService->registerPlugins($settings['editorPlugins']);
+    // }
 
     /**
      * @inheritdoc

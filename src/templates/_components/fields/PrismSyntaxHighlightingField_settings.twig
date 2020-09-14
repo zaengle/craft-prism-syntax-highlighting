@@ -48,11 +48,3 @@
     name: 'editorTabWidth',
     value: field['editorTabWidth'] is empty ? defaults['editorTabWidth'] : field['editorTabWidth']})
 }}
-
-{{ forms.lightswitchField({
-    label: 'Line Numbers',
-    instructions: 'Should line numbers be displayed?',
-    id: 'editorLineNumbers',
-    name: 'editorLineNumbers',
-	on: field['editorLineNumbers'] is null ? defaults['editorLineNumbers'] : field['editorLineNumbers']})
-}}

@@ -36,6 +36,11 @@ class Settings extends Model
     public $editorLanguages = ['css','javascript','markup','json'];
 
     /**
+     * @var array
+     */
+    public $editorPlugins = ['line-numbers'];
+
+    /**
      * @var string
      */
     public $editorHeight = '4';
@@ -44,11 +49,6 @@ class Settings extends Model
      * @var string
      */
     public $editorTabWidth = '4';
-
-    /**
-     * @var string
-     */
-    public $editorLineNumbers = false;
 
     /**
      * @var string
@@ -90,6 +90,17 @@ class Settings extends Model
     }
 
     /**
+     * Returns an array of plugins for the twig templates
+     * @author Josh Smith <josh@batch.nz>
+     * @param  array  $definitions An array of existing plugin definitions
+     * @return array
+     */
+    public function getPlugins($definitions = [])
+    {
+        return Plugin::$plugin->prismService->getDefinitions('plugins', $definitions);
+    }
+
+    /**
      * Returns an array of available editor themes for the twig templates
      * @author Josh Smith <me@joshsmith.dev>
      * @return array
@@ -110,6 +121,21 @@ class Settings extends Model
     }
 
     /**
+     * Returns an array of available editor plugins for the twig templates
+     * @author Josh Smith <me@joshsmith.dev>
+     * @return array
+     */
+    public function getEditorPlugins()
+    {
+        return $this->getPlugins($this->editorPlugins);
+    }
+
+    public function hasEditorPlugin(string $plugin)
+    {
+        return array_key_exists($plugin, $this->getEditorPlugins());
+    }
+
+    /**
      * @inheritdoc
      */
     public function rules()
@@ -121,8 +147,6 @@ class Settings extends Model
             ['editorHeight', 'default', 'value' => '4'],
             ['editorTabWidth', 'string'],
             ['editorTabWidth', 'default', 'value' => '4'],
-            ['editorLineNumbers', 'boolean'],
-            ['editorLineNumbers', 'default', 'value' => false],
             ['customThemesDir', 'string']
         ];
     }

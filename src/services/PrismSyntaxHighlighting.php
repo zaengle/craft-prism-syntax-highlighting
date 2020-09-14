@@ -14,12 +14,6 @@ use thejoshsmith\prismsyntaxhighlighting\Plugin;
  */
 class PrismSyntaxHighlighting extends Component
 {
-    /**
-     * Define a cache key to hold the definitions
-     * @var string
-     */
-    const DEFINITIONS_CACHE_KEY = 'prismSyntaxHighlighting:definitions';
-
 	/**
 	 * Define the config file that holds the language definitions
 	 * @var string
@@ -31,6 +25,21 @@ class PrismSyntaxHighlighting extends Component
      * @var array
      */
     const CRAFTCMS_CP_LANGUAGES = ['markup', 'javascript', 'json'];
+
+    /**
+     * Define a cache key to hold the definitions
+     * @var string
+     */
+    const DEFINITIONS_CACHE_KEY = 'prismSyntaxHighlighting:definitions';
+
+    /**
+     * Define definition types
+     * @var  string
+     */
+    const DEFINITION_TYPE_CORE = 'core';
+    const DEFINITION_TYPE_LANGUAGES = 'languages';
+    const DEFINITION_TYPE_PLUGINS = 'plugins';
+    const DEFINITION_TYPE_THEMES = 'themes';
 
     /**
      * The internal path to the plugin config file
@@ -57,6 +66,56 @@ class PrismSyntaxHighlighting extends Component
 	protected $config = [];
 
     /**
+     * Returns a single prism definition
+     * @see getDefinitions
+     * @author Josh Smith <josh@batch.nz>
+     * @param  string $type     Type of definition to return
+     * @param  array  $config   An array of config filters
+     * @return object
+     */
+    public function getDefinition(string $handle, string $type = '')
+    {
+        if( empty($type) ) return null;
+
+        $definitions = $this->getPrismDefinitions($type);
+
+        return empty($definitions->$handle) ? null : $definitions->$handle;
+    }
+
+    /**
+     * Returns a theme definition
+     * @author Josh Smith <josh@batch.nz>
+     * @param  string $handle Definition
+     * @return object
+     */
+    public function getThemeDefinition(string $handle)
+    {
+        return $this->getDefinition($handle, self::DEFINITION_TYPE_THEMES);
+    }
+
+    /**
+     * Returns a theme definition
+     * @author Josh Smith <josh@batch.nz>
+     * @param  string $handle Definition
+     * @return object
+     */
+    public function getLanguageDefinition(string $handle)
+    {
+        return $this->getDefinition($handle, self::DEFINITION_TYPE_LANGUAGES);
+    }
+
+    /**
+     * Returns a theme definition
+     * @author Josh Smith <josh@batch.nz>
+     * @param  string $handle Definition
+     * @return object
+     */
+    public function getPluginDefinition(string $handle)
+    {
+        return $this->getDefinition($handle, self::DEFINITION_TYPE_PLUGINS);
+    }
+
+    /**
      * Returns parsed Prism definitions for the given type
      *
      * Allowed types are:
@@ -69,8 +128,9 @@ class PrismSyntaxHighlighting extends Component
      *     {{Internal Definition}} => {{Display Title}}
      *
      * @author Josh Smith <me@joshsmith.dev>
-     * @param  string $type Type of definition to return
-     * @return array        An array of Prism definitions
+     * @param  string $type     Type of definition to return
+     * @param  array  $config   An array of config filters
+     * @return array            An array of Prism definitions
      */
     public function getDefinitions(string $type = '', array $config = []): array
     {
@@ -147,6 +207,35 @@ class PrismSyntaxHighlighting extends Component
     }
 
     /**
+     * Returns definition requirements from the Prism components file
+     * Recursively loads all dependencies for each definition (if any)
+     *
+     * @author Josh Smith <me@joshsmith.dev>
+     * @param  string $definition   A prims JS definition
+     * @param  array  &$definitions An array of currently loaded requirements
+     * @return array                An array of definition requirements
+     */
+    public function getDefinitionRequirements(string $definition, string $type, array &$definitions = []): array
+    {
+        $prismDefinition = $this->getDefinition($definition, $type);
+        $requirements = $prismDefinition->require ?? '';
+
+        // Add the definition to the array
+        $definitions[] = $definition;
+
+        if( empty($requirements) ) return $definitions;
+        if( is_string($requirements) ) $requirements = explode(',', $requirements);
+
+        // Recursively parse out other requirements
+        foreach ($requirements as $requirement) {
+            $this->getDefinitionRequirements($requirement, $type, $definitions);
+        }
+
+        // Load dependencies in reverse order
+        return array_reverse($definitions);
+    }
+
+    /**
      * Returns language definition requirements from the Prism components file
      * Recursively loads all JS dependencies for each language (if any)
      *
@@ -157,23 +246,35 @@ class PrismSyntaxHighlighting extends Component
      */
     public function getLanguageDefinitionRequirements(string $definition = '', array &$definitions = []): array
     {
-        $languagesDefinitions = $this->getPrismDefinitions('languages');
-        $languageDefinitions = $languagesDefinitions->$definition ?? [];
-        $requirements = $languageDefinitions->require ?? [];
+        return $this->getDefinitionRequirements($definition, self::DEFINITION_TYPE_LANGUAGES, $definitions);
+    }
 
-        // Add the definition to the array
-        $definitions[] = $definition;
+    /**
+     * Returns theme definition requirements from the Prism components file
+     * Recursively loads all CSS dependencies for each theme (if any)
+     *
+     * @author Josh Smith <me@joshsmith.dev>
+     * @param  string $definition   A theme definition
+     * @param  array  &$definitions An array of currently loaded requirements
+     * @return array                An array of definition requirements
+     */
+    public function getThemeDefinitionRequirements(string $definition = '', array &$definitions = []): array
+    {
+        return $this->getDefinitionRequirements($definition, self::DEFINITION_TYPE_THEMES, $definitions);
+    }
 
-        if( empty($requirements) ) return $definitions;
-        if( is_string($requirements) ) $requirements = explode(',', $requirements);
-
-        // Recursively parse out other requirements
-        foreach ($requirements as $requirement) {
-            $this->getLanguageDefinitionRequirements($requirement, $definitions);
-        }
-
-        // Load dependencies in reverse order
-        return array_reverse($definitions);
+    /**
+     * Returns plugin definition requirements from the Prism components file
+     * Recursively loads all dependencies for each plugin (if any)
+     *
+     * @author Josh Smith <me@joshsmith.dev>
+     * @param  string $definition   A plugin definition
+     * @param  array  &$definitions An array of currently loaded requirements
+     * @return array                An array of definition requirements
+     */
+    public function getPluginDefinitionRequirements(string $definition = '', array &$definitions = []): array
+    {
+        return $this->getDefinitionRequirements($definition, self::DEFINITION_TYPE_PLUGINS, $definitions);
     }
 
     /**

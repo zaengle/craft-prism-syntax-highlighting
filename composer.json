@@ -40,6 +40,6 @@
         "class": "thejoshsmith\\prismsyntaxhighlighting\\Plugin"
     },
     "require-dev": {
-        "prismjs/prism": "^1.16"
+        "prismjs/prism": "^1.20"
     }
 }

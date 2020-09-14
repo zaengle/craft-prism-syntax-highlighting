@@ -57,14 +57,25 @@
     name: 'editorTabWidth',
     value: settings['editorTabWidth']})
 }}
+<hr>
+<h2>{{ "Plugins"|t('craft-prism-syntax-highlighting') }}</h2>
+<p>Choose the plugins you want to use.</p>
 
-{{ forms.lightswitchField({
-    label: 'Line Numbers',
-    instructions: 'Should line numbers be displayed?',
-    id: 'editorLineNumbers',
-    name: 'editorLineNumbers',
-    on: settings['editorLineNumbers']})
-}}
+{% set plugins = settings.getPlugins() %}
+{% if plugins|length %}
+    {% for handle, name in plugins %}
+        {% set plugin = craft.prism.definition(handle, 'plugins') %}
+        {{ forms.lightswitchField({
+            label: name,
+            instructions: plugin.description,
+            id: handle,
+            name: 'editorPlugins[]',
+            value: handle,
+            on: handle in settings['editorPlugins']})
+        }}
+    {% endfor %}
+{% endif %}
+
 <hr>
 <h2>{{ "Custom Settings"|t('craft-prism-syntax-highlighting') }}</h2>
 <p>Set a directory path for your custom CSS. You'll need to edit the plugin config to set which custom themes are selectable.</p>

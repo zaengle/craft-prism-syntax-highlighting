@@ -8,5 +8,5 @@
 return [
   'languages' => ['*'],
   'themes' => ['*'],
-  'plugins' => ['line-numbers']
+  'plugins' => ['autolinker','copy-to-clipboard','inline-color','line-highlight','line-numbers','previewers','show-language','show-invisibles']
 ];

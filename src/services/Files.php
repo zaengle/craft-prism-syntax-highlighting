@@ -31,6 +31,7 @@ class Files extends Component
     const PRISM_DIST_DIR = '@thejoshsmith/prismsyntaxhighlighting/assetbundles/prismsyntaxhighlighting/dist';
     const PRISM_THEMES_DIR = 'css/prism/themes/';
     const PRISM_LANGUAGES_DIR = 'js/prism/components/';
+    const PRISM_PLUGINS_DIR = 'js/prism/plugins/';
 
     public function getEditorThemeFiles(array $files = [], $dir = self::PRISM_THEMES_DIR, $customDir = ''): array
     {
@@ -46,7 +47,7 @@ class Files extends Component
 
     public function getEditorThemeFile(string $file, $dir = self::PRISM_THEMES_DIR, $customDir = ''): string
     {
-        return self::PRISM_THEMES_DIR.$file.'.css';
+        return $dir.$file.'.css';
     }
 
     public function getEditorLanguageFiles(array $files, $dir = self::PRISM_LANGUAGES_DIR): array
@@ -71,10 +72,42 @@ class Files extends Component
         // Loop all language requirements and resolve the filepaths
         foreach ($editorLanguageFileRequirements as $requirement) {
             $filename = 'prism-'.$requirement.'.min.js'; // Ok to hardcode here, it's the only place it's used.
-            $editorLanguageFiles[] = self::PRISM_LANGUAGES_DIR.$filename;
+            $editorLanguageFiles[] = $dir.$filename;
         }
 
         return $editorLanguageFiles;
+    }
+
+    public function getEditorPluginFiles(array $files, $dir = self::PRISM_PLUGINS_DIR): array
+    {
+        $editorPluginFiles = [];
+
+        foreach ($files as $file) {
+            $editorPluginFiles = array_merge($editorPluginFiles, $this->getEditorPluginFile($file));
+        }
+
+        return $editorPluginFiles;
+    }
+
+    public function getEditorPluginFile(string $file, $dir = self::PRISM_PLUGINS_DIR): array
+    {
+        $prismService = Plugin::$plugin->prismService;
+
+        $editorFiles = [];
+        $editorPrismFileRequirements = $prismService->getPluginDefinitionRequirements($file);
+
+        // Loop all language requirements and resolve the filepaths
+        foreach ($editorPrismFileRequirements as $requirement) {
+            $definition = $prismService->getPluginDefinition($requirement);
+            $filepath = $dir.$requirement.'/'.'prism-'.$requirement;
+
+            if( empty($definition->noCSS) ){
+                $editorFiles[] = $filepath.'.css';
+            }
+            $editorFiles[] = $filepath.'.min.js';
+        }
+
+        return $editorFiles;
     }
 
     /**
@@ -107,6 +140,39 @@ class Files extends Component
         }
 
         return $files;
+    }
+
+    /**
+     * Returns editor plugin asset files for an asset bundle to load
+     * @author Josh Smith <me@joshsmith.dev>
+     * @param  array $files
+     * @return AssetBundle
+     */
+    public function getEditorPluginAssetBundleFiles(array $plugins)
+    {
+        return $this->getEditorPluginFiles($plugins);
+    }
+
+    /**
+     * Returns a filtered set of JS files
+     * @author Josh Smith <josh@batch.nz>
+     * @param  array  $files An array of files to filter
+     * @return array
+     */
+    public function filterJsFiles(array $files = []): array
+    {
+        return array_filter($files, function($file){ return substr(strrchr($file,'.'), 1) === 'js'; });
+    }
+
+    /**
+     * Returns a filtered set of CSS files
+     * @author Josh Smith <josh@batch.nz>
+     * @param  array  $files An array of files to filter
+     * @return array
+     */
+    public function filterCssFiles(array $files = []): array
+    {
+        return array_filter($files, function($file){ return substr(strrchr($file,'.'), 1) === 'css'; });
     }
 
     /**
