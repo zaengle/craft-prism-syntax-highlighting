@@ -40,6 +40,15 @@
         "class": "thejoshsmith\\prismsyntaxhighlighting\\Plugin"
     },
     "require-dev": {
-        "prismjs/prism": "^1.16"
-    }
+        "prismjs/prism": "^1.16",
+        "craftcms/rector": "dev-main"
+    },
+    "config": {
+        "allow-plugins": {
+            "yiisoft/yii2-composer": true,
+            "craftcms/plugin-installer": true
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

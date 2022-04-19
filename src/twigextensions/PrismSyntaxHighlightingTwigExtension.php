@@ -19,7 +19,7 @@ use Craft;
  * @package   PrismSyntaxHighlighting
  * @since     1.0.0
  */
-class PrismSyntaxHighlightingTwigExtension extends \Twig_Extension
+class PrismSyntaxHighlightingTwigExtension extends \Twig\Extension\AbstractExtension
 {
     // // Public Methods
     // // =========================================================================
