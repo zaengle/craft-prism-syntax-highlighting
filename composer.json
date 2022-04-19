@@ -40,7 +40,7 @@
         "class": "thejoshsmith\\prismsyntaxhighlighting\\Plugin"
     },
     "require-dev": {
-        "prismjs/prism": "^1.16",
+        "prismjs/prism": "^1.27",
         "craftcms/rector": "dev-main"
     },
     "config": {
