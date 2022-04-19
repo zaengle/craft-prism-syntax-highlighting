@@ -142,4 +142,18 @@ class Plugin extends CraftPlugin
             ]
         );
     }
+
+
+    /**
+     * Copy example config to project's config folder
+     */
+    protected function afterInstall(): void
+    {
+        $configSource = __DIR__ . DIRECTORY_SEPARATOR . 'config/prismsyntaxhighlighting.php';
+        $configTarget = Craft::$app->getConfig()->configDir . DIRECTORY_SEPARATOR . 'prismsyntaxhighlighting.php' ;
+
+        if (!file_exists($configTarget)) {
+            copy($configSource, $configTarget);
+        }
+    }
 }

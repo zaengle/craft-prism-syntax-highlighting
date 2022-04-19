@@ -1,5 +1,5 @@
 ![Icon](resources/img/icon.png?raw=true "Icon") 
-# Prism Syntax Highlighting plugin for Craft CMS 3.x
+# Prism Syntax Highlighting plugin for Craft CMS 4.x
 
 Adds a new field type that provides syntax highlighting capabilities using PrismJS.
 
@@ -29,7 +29,7 @@ Coming soon:
 
 ## Requirements
 
-This plugin requires Craft CMS 3.0.0-beta.23 or later.
+This plugin requires Craft CMS 4.0.0-beta.4 or later.
 
 ## Installation
 
